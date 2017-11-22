@@ -69,6 +69,5 @@ pygame.display.flip()
 while True:
 	event = pygame.event.wait()
 	if event.type == KEYDOWN: break
-	writeFile(result.txt, points)
 
 
