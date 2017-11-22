@@ -56,5 +56,3 @@ def openGui():
                 
     pygame.quit()
     return cities
-
-
