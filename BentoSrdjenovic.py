@@ -47,7 +47,6 @@ def draw(positions):
         
 def collectingPoint():
     cities = []
-    draw(cities)
 
     points = {}
     inc = 0;
@@ -94,8 +93,6 @@ def ga_solve(file = None, gui=True, maxtime=0):
 
     
     time.clock()
-    cCities = cities
-    actualCity = cCities.pop(0)
     hist = []
     tabJourney = []
     
@@ -106,19 +103,20 @@ def ga_solve(file = None, gui=True, maxtime=0):
 
         hist = []
         while len(hist) < len(cities):
-            exit = False
-            while exit is False:
+            blExit = False
+            while blExit is False:
                 val = random.randint(0,len(cities)-1)
                 if val not in hist:
-                    exit = True
+                    blExit = True
                     hist.append(val)
-        
         tabJourney.append(Path(hist,computeDist(cities,hist)))
 
 
 
     pourcentageCross = 0.4
     pourcentageSel = 0.2
+    pourcentageMut = 0.2
+    chanceToMut = 0.3
     historyBest = []
     exitLoop = False
     while exitLoop is False:   
@@ -135,8 +133,19 @@ def ga_solve(file = None, gui=True, maxtime=0):
 
         tabJourney.sort(key=lambda x: x.length, reverse=False)
         tabJourney = selection(tabJourney, pourcentageSel)
+
+
+        val = random.randint(1,100)
+        if val < 100*chanceToMut:
+            nbMutation = int(len(tabJourney)*pourcentageMut)
+
+            for i in range(0, nbMutation):
+                index = random.randint(0,len(tabJourney)-1)
+                mutation(tabJourney, index)
+                tabJourney[index].length = computeDist(cities, tabJourney[index].hist)
+        
         tabJourney.sort(key=lambda x: x.length, reverse=False)
-            
+        
         if len(historyBest) < 100:
             if tabJourney[0].length in historyBest:          
                 historyBest.append(tabJourney[0].length)
@@ -182,9 +191,16 @@ def selection(tabJourney, pourcentage):
     tabJourney = []
     return tabTemp
     
-    
-    
 
+def mutation(tabJourney, index):
+    i1 = random.randint(0,len(tabJourney[index].hist)-1)
+    i2 = random.randint(0,len(tabJourney[index].hist)-1)
+    while i2 == i1:
+        i2 = random.randint(0,len(tabJourney[index].hist)-1)
+    valTemp = tabJourney[index].hist[i1]
+    tabJourney[index].hist[i1] = tabJourney[index].hist[i2]
+    tabJourney[index].hist[i2] = valTemp
+    
 
 def cross(tabJourney, v1, v2, cities):
     val1 = random.randint(0,int((len(cities)-1)/2))
@@ -262,9 +278,9 @@ def pyta(val1,val2):
         
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        ga_solve(file = sys.argv[1],gui = True, maxtime = 90)
+        ga_solve(file = sys.argv[1],gui = False, maxtime = 30)
     else:
-        ga_solve(file = None,gui = True, maxtime = 90)
+        ga_solve(file = None,gui = True, maxtime = 30)
     
         
     
